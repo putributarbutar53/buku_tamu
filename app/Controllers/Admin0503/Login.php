@@ -14,7 +14,7 @@ class Login extends BaseController
     use ResponseTrait;
     function __construct()
     {
-        // $this->model = new AdminModel();
+        $this->model = new AdminModel();
         $this->validation = \Config\Services::validation();
         helper("cookie");
         helper("global_fungsi_helper");
