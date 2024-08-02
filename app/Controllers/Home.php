@@ -23,29 +23,6 @@ class Home extends BaseController
         return view('web/index');
     }
 
-    public function checkNik()
-    {
-
-        $nik = $this->request->getPost('nik');
-
-        // Mengambil data berdasarkan NIK
-        $data = $this->model->getDataByNik($nik);
-
-
-        if ($data) {
-            // Jika data ditemukan
-            return $this->response->setJSON([
-                'success' => true,
-                'nama' => $data['nama']
-            ]);
-        } else {
-            // Jika data tidak ditemukan
-            return $this->response->setJSON([
-                'success' => false
-            ]);
-        }
-    }
-
     public function submit()
     {
         $nik = $this->request->getPost('nik');
