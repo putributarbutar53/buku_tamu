@@ -23,26 +23,41 @@ class Home extends BaseController
         return view('web/index');
     }
 
-    public function checkNik()
+    public function submit()
     {
-
         $nik = $this->request->getPost('nik');
+        $tujuan = $this->request->getPost('tujuan');
+        $kepentingan = $this->request->getPost('kepentingan');
 
-        // Mengambil data berdasarkan NIK
-        $data = $this->model->getDataByNik($nik);
+        // Cek apakah NIK sudah ada di database
+        $existingData = $this->model->getDataByNik($nik);
 
-
-        if ($data) {
-            // Jika data ditemukan
+        if ($existingData) {
+            // Jika NIK sudah ada, tampilkan nama dan pesan
             return $this->response->setJSON([
                 'success' => true,
-                'nama' => $data['nama']
+                'message' => 'Data sudah ada!',
+                'nama' => $existingData['nama']
             ]);
         } else {
-            // Jika data tidak ditemukan
-            return $this->response->setJSON([
-                'success' => false
-            ]);
+            // Jika NIK belum ada, simpan data baru
+            $data = [
+                'nik'        => $nik,
+                'tujuan'     => $tujuan,
+                'kepentingan' => $kepentingan,
+            ];
+
+            if ($this->pengunjung->insert($data)) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Data berhasil disimpan!'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat menyimpan data.'
+                ]);
+            }
         }
     }
 }
