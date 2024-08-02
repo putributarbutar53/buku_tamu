@@ -106,7 +106,7 @@
                     ),
                     url(<?= base_url() ?>web/images/hero/bg.png);
                 "></div>
-                        <div class="container">
+                        <div class="container" style="margin-top: -120px;">
                             <div class="row justify-content-center">
                                 <div class="col-lg-6">
                                     <div class="hero-info text-center">
@@ -118,6 +118,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
                 <div class="swiper-slide">
@@ -130,7 +131,7 @@
                     ),
                     url(<?= base_url() ?>web/images/hero/bg-2.png);
                 "></div>
-                        <div class="container h-100">
+                        <div class="container h-100" style="margin-top: -120px;">
                             <div class="row justify-content-center">
                                 <div class="col-lg-6">
                                     <div class="hero-info text-center">
@@ -149,19 +150,37 @@
 
         <!-- Form placed outside swiper-wrapper -->
         <div class="form-container position-absolute w-100 d-flex justify-content-center">
-            <form id="main-form" class="footer-subscribe-form mt-4 d-flex justify-content-between align-items-center" action="#">
-                <input id="nik-input" class="w-100 border-0 h-100 ps-3 pe-3" type="number" placeholder="NIK" />
-                <button class="common-btn h-100 flex-shrink-0 border-0 border-radius-0 ms-lg-4 ms-2" type="submit">
-                    <span>Daftar</span>
-                </button>
+            <form id="main-form" class="footer-subscribe-form mt-4 p-4" action="<?= site_url('home/submit') ?>" method="post">
+                <?= csrf_field() ?>
+                <div class="row">
+                    <div class="col-12 col-md-6 mb-3">
+                        <input id="nik-input" name="nik" class="form-control" type="number" placeholder="NIK" />
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <select id="tujuan-input" name="tujuan" class="form-select">
+                            <option value=""> Pilih Tujuan</option>
+                            <option value="Kepala Dinas">Kepala Dinas</option>
+                            <option value="Sekretaris">Sekretaris</option>
+                            <option value="Tata Usaha">Tata Usaha</option>
+                            <option value="Tata Kelola Pemerintahan Berbasis Elektronik">Tata Kelola Pemerintahan Berbasis Elektronik</option>
+                            <option value="Pengelolaan Infomasi dan Komunikasi Publik">Pengelolaan Infomasi dan Komunikasi Publik</option>
+                            <option value="Statistik dan Persandian">Statistik dan Persandian</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <textarea id="kepentingan-input" name="kepentingan" class="form-control" rows="4" placeholder="Kepentingan"></textarea>
+                </div>
+                <button class="btn btn-warning w-100" type="submit">Daftar</button>
             </form>
+
         </div>
         <div class="cta-area cta-area-two">
             <div class="container">
                 <div class="row gy-5 cta-wrap">
                     <div class="col-lg-3 col-md-6 cta-single">
                         <div class="cta-info text-center wow fadeInLeft" data-wow-delay=".0s">
-                            <h2 class="counter-item">
+                            <h2 class="counter-iem">
                                 <span class="odometer d-inline-block" data-odometer-final="15">.</span>
                             </h2>
                             <p>Visitors</p>
@@ -237,81 +256,48 @@
                 }
             }
         });
+        document.getElementById('main-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Mencegah form dari submit default
 
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                const synth = window.speechSynthesis;
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'id-ID'; // Bahasa Indonesia
-                console.log('Speaking:', text); // Log untuk memastikan fungsi dipanggil
-                synth.speak(utterance);
-            } else {
-                console.error('Speech synthesis not supported in this browser.');
-            }
-        }
+            var form = e.target;
+            var formData = new FormData(form);
 
-
-        document.querySelector('#main-form').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Mencegah form submit
-
-            const nik = document.querySelector('#nik-input').value;
-
-            try {
-                // Setelah "Selamat datang!" selesai dibaca, lakukan AJAX request
-                const response = await fetch('<?= base_url('home/checkNik') ?>', {
+            fetch(form.action, {
                     method: 'POST',
+                    body: formData,
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        'nik': nik
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    const welcomeMessage = `Selamat Datang ${data.nama}`;
-                    await speak(welcomeMessage);
-
-                    // Tampilkan SweetAlert2
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses!',
+                            text: data.message,
+                            timer: 1000, // Menampilkan alert selama 3 detik
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Redirect atau lakukan tindakan lain setelah sukses
+                            window.location.href = '<?= base_url() ?>'; // Ganti dengan URL tujuan Anda
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: data.message
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                     Swal.fire({
-                        title: 'Selamat Datang!',
-                        text: `${data.nama}`,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(async (result) => {
-                        // Bacakan pesan selamat datang yang lengkap setelah modal ditutup
-                        if (result.isConfirmed) {
-
-
-                            // Reset form setelah SweetAlert2 ditutup
-                            document.querySelector('#main-form').reset();
-                        }
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Oops!',
-                        text: 'NIK tidak ditemukan.',
                         icon: 'error',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        // Reset form jika NIK tidak ditemukan
-                        document.querySelector('#main-form').reset();
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan pada server.'
                     });
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan saat memproses data.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Reset form jika terjadi kesalahan
-                    document.querySelector('#main-form').reset();
                 });
-            }
         });
     </script>
 
