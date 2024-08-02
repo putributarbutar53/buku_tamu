@@ -48,23 +48,39 @@ class Home extends BaseController
 
     public function submit()
     {
+        $nik = $this->request->getPost('nik');
+        $tujuan = $this->request->getPost('tujuan');
+        $kepentingan = $this->request->getPost('kepentingan');
 
-        $data = [
-            'nik'        => $this->request->getPost('nik'),
-            'tujuan'     => $this->request->getPost('tujuan'),
-            'kepentingan' => $this->request->getPost('kepentingan'),
-        ];
+        // Cek apakah NIK sudah ada di database
+        $existingData = $this->model->getDataByNik($nik);
 
-        if ($this->pengunjung->insert($data)) {
+        if ($existingData) {
+            // Jika NIK sudah ada, tampilkan nama dan pesan
             return $this->response->setJSON([
                 'success' => true,
-                'message' => 'Data berhasil disimpan!'
+                'message' => 'Data sudah ada!',
+                'nama' => $existingData['nama']
             ]);
         } else {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Terjadi kesalahan saat menyimpan data.'
-            ]);
+            // Jika NIK belum ada, simpan data baru
+            $data = [
+                'nik'        => $nik,
+                'tujuan'     => $tujuan,
+                'kepentingan' => $kepentingan,
+            ];
+
+            if ($this->pengunjung->insert($data)) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Data berhasil disimpan!'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan saat menyimpan data.'
+                ]);
+            }
         }
     }
 }

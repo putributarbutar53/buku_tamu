@@ -256,6 +256,18 @@
                 }
             }
         });
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const synth = window.speechSynthesis;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID'; // Bahasa Indonesia
+                console.log('Speaking:', text); // Log untuk memastikan fungsi dipanggil
+                synth.speak(utterance);
+            } else {
+                console.error('Speech synthesis not supported in this browser.');
+            }
+        }
         document.getElementById('main-form').addEventListener('submit', function(e) {
             e.preventDefault(); // Mencegah form dari submit default
 
@@ -274,10 +286,13 @@
                     if (data.success) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Sukses!',
-                            text: data.message,
-                            timer: 1000, // Menampilkan alert selama 3 detik
-                            showConfirmButton: false
+                            title: 'Selamat Datang!',
+                            text: `${data.nama}`,
+                            timer: 2000, // Menampilkan alert selama 3 detik
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                speak(`Selamat datang, ${data.nama}`);
+                            }
                         }).then(() => {
                             // Redirect atau lakukan tindakan lain setelah sukses
                             window.location.href = '<?= base_url() ?>'; // Ganti dengan URL tujuan Anda
