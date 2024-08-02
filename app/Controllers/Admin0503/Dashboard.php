@@ -1,11 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dahsboard</title>
-</head>
-<body>
-    <h3>Hello World</h3>
-</body>
-</html>
+<?php
+
+namespace App\Controllers\Admin0503;
+
+use App\Controllers\BaseController;
+use App\Models\AdminModel;
+use CodeIgniter\API\ResponseTrait;
+use App\Models\SktModel;
+use App\Models\DiskusiModel;
+use CodeIgniter\Config\Config;
+
+class Dashboard extends BaseController
+{
+    use ResponseTrait;
+    var $diskusi, $model, $skt;
+    function __construct()
+    {
+        $this->model = new AdminModel();
+    }
+    public function index()
+    {
+        return view('admin/try');
+    }
+}
