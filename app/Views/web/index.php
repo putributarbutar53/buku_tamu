@@ -104,8 +104,7 @@
                       rgba(0, 0, 0, 0.37) 16.65%,
                       #000 100.78%
                     ),
-                    url(<?= base_url() ?>web/images/hero/bg.png);
-                "></div>
+                    url(<?= base_url() ?>web/images/hero/bg.png);"></div>
                         <div class="container" style="margin-top: -120px;">
                             <div class="row justify-content-center">
                                 <div class="col-lg-6">
@@ -129,8 +128,7 @@
                       rgba(0, 0, 0, 0.37) 16.65%,
                       #000 100.78%
                     ),
-                    url(<?= base_url() ?>web/images/hero/bg-2.png);
-                "></div>
+                    url(<?= base_url() ?>web/images/hero/bg-2.png);"></div>
                         <div class="container h-100" style="margin-top: -120px;">
                             <div class="row justify-content-center">
                                 <div class="col-lg-6">
