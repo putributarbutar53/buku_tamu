@@ -35,9 +35,6 @@ class Login extends BaseController
                 'admin_name' => $dataAkun['name'],
                 'admin_email' => $dataAkun['email'],
                 'admin_role' => $dataAkun['role'],
-                'admin_id' => $dataAkun['id'],
-                'admin_skpd' => $dataAkun['id_skpd'],
-                'admin_picture' => $dataAkun['picture'],
             ];
             session()->set($akun);
             return redirect()->to('admin0503/dashboard');
