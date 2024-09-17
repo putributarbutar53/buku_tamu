@@ -39,6 +39,7 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="<?= base_url() ?>web/css/style.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         .swiper {
             height: 100vh;
@@ -110,7 +111,7 @@
                     ),
                     url(<?= base_url() ?>web/images/hero/bg-4.png);
                 "></div>
-                        <div class="container" style="margin-top: -120px;">
+                        <div class="container" style="margin-top: -170px;">
                             <div class="row justify-content-center">
                                 <div class="col-lg-6">
                                     <div class="hero-info text-center">
@@ -135,7 +136,7 @@
                     ),
                     url(<?= base_url() ?>web/images/hero/bg-3.png);
                 "></div>
-                        <div class="container" style="margin-top: -120px;">
+                        <div class="container" style="margin-top: -170px;">
                             <div class="row justify-content-center">
                                 <div class="col-lg-6">
                                     <div class="hero-info text-center">
@@ -160,7 +161,7 @@
                     ),
                     url(<?= base_url() ?>web/images/hero/bg.png);
                 "></div>
-                        <div class="container" style="margin-top: -120px;">
+                        <div class="container" style="margin-top: -170px;">
                             <div class="row justify-content-center">
                                 <div class="col-lg-6">
                                     <div class="hero-info text-center">
@@ -184,7 +185,7 @@
                       #000 100.78%
                     ),
                     url(<?= base_url() ?>web/images/hero/bg-2.png);"></div>
-                        <div class="container h-100" style="margin-top: -120px;">
+                        <div class="container h-100" style="margin-top: -170px;">
                             <div class="row justify-content-center">
                                 <div class="col-lg-6">
                                     <div class="hero-info text-center">
@@ -204,6 +205,7 @@
 
         <!-- Form placed outside swiper-wrapper -->
         <div class="form-container position-absolute w-100 d-flex justify-content-center">
+
             <form id="main-form" class="footer-subscribe-form mt-4 p-4" action="<?= site_url('home/submit') ?>" method="post">
                 <?= csrf_field() ?>
                 <div class="row">
@@ -223,18 +225,67 @@
                             </select>
                         </div>
                     </div>
+
                 </div>
-                <div class="mb-3">
-                    <textarea id="kepentingan-input" name="kepentingan" class="form-control" rows="4" placeholder="Kepentingan" style="width: 100%; box-sizing: border-box;"></textarea>
+
+                <div class="row">
+
+                    <!-- Area Textarea untuk Kepentingan -->
+                    <div class="col-md-6 mb-3">
+                        <textarea id="kepentingan-input" name="kepentingan" class="form-control" rows="4" placeholder="Kepentingan" style="width: 100%; box-sizing: border-box;"></textarea>
+                    </div>
+
+                    <!-- Area Canvas untuk Tanda Tangan -->
+                    <div class="col-md-6 mb-3">
+                        <canvas id="signature-canvas" width="300" height="110" style="border:1px solid #000;"></canvas>
+                        <button id="clear-canvas" class="btn btn-danger mt-2"><i class="fas fa-trash"></i> Clear TTD</button>
+                    </div>
                 </div>
-                <!-- <button id="start-scan" class="btn btn-success w-100 mt-2" type="button">Pindai</button> -->
-                <button class="btn btn-warning w-100" type="submit">Daftar</button>
+                <div class="col-12 col-md-4 mb-3">
+                    <div class="row mt-3">
+                        <!-- Preview Foto -->
+                        <div class="col-12 mb-3">
+                            <img id="photoPreview" style="width: 70%; height: auto; display: none; margin-top: -70px;" alt="Preview Foto" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="row mt-3 g-2">
+                        <!-- Tombol Ambil Gambar -->
+                        <div class="col-6 mb-3">
+                            <button id="take-picture" class="btn btn-success w-100" style="margin-top: -30px;"><i class="fas fa-camera"></i> Foto</button>
+                        </div>
+
+                        <!-- Tombol Daftar -->
+                        <div class="col-6 mb-3">
+                            <button class="btn btn-warning w-100" type="submit" style="margin-top: -30px;">Daftar</button>
+                        </div>
+                    </div>
+                </div>
+
             </form>
         </div>
-        <!-- <div id="reader"></div>
-        <div id="result">
-            Result goes here
-        </div> -->
+        <!-- Modal -->
+        <div class="modal fade" id="webcamModal" tabindex="-1" aria-labelledby="webcamModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="webcamModalLabel">Ambil Foto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <video id="webcam" autoplay style="width: 100%; height: auto; max-height: 400px; object-fit: cover;"></video>
+                        <canvas id="photoCanvas" style="display: none;"></canvas>
+                        <img id="photoResult" style="width: 100%; display: none;" alt="Hasil Foto" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="take-photo" class="btn btn-primary">Ambil Foto</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="cta-area cta-area-two">
             <div class="container">
                 <div class="row gy-5 cta-wrap">
@@ -365,6 +416,45 @@
         document.getElementById('main-form').addEventListener('submit', function(e) {
             e.preventDefault(); // Mencegah form dari submit default
 
+            // Ambil nilai dari form
+            const nik = document.getElementById('nik-input').value.trim();
+            const tujuan = document.getElementById('tujuan-input').value.trim();
+            const kepentingan = document.getElementById('kepentingan-input').value.trim();
+            const isPhotoTaken = document.getElementById('photoPreview').src !== '';
+            // Mengambil elemen canvas dan konteks
+            const signatureCanvas = document.getElementById('signature-canvas');
+            const signatureContext = signatureCanvas.getContext('2d');
+
+            // Menghapus konten canvas dan mengatur latar belakang putih
+            function clearCanvas() {
+                // Menghapus konten canvas
+                signatureContext.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+
+                // Mengatur latar belakang putih
+                signatureContext.fillStyle = '#FFFFFF'; // Warna putih
+                signatureContext.fillRect(0, 0, signatureCanvas.width, signatureCanvas.height); // Menggambar kotak putih
+            }
+
+            // Event listener untuk tombol Clear TTD
+            document.getElementById('clear-canvas').addEventListener('click', clearCanvas);
+            let errorMessage = '';
+
+            // Validasi input
+            if (!nik) errorMessage += 'NIK belum diisi.<br>';
+            if (!tujuan) errorMessage += 'Tujuan belum dipilih.<br>';
+            if (!kepentingan) errorMessage += 'Kepentingan belum diisi.<br>';
+            if (!isPhotoTaken) errorMessage += 'Foto belum diambil.<br>';
+
+            // Tampilkan pesan jika ada kesalahan
+            if (errorMessage) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Perhatian!',
+                    html: errorMessage // Menggunakan HTML untuk menampilkan pesan kesalahan dalam format daftar
+                });
+                return;
+            }
+
             var form = e.target;
             var formData = new FormData(form);
 
@@ -378,21 +468,27 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Menentukan teks yang akan dibaca berdasarkan ketersediaan nama
                         const welcomeText = data.nama ? `Selamat datang, ${data.nama}` : 'Selamat datang';
 
                         Swal.fire({
                             icon: 'success',
                             title: 'Selamat Datang!',
-                            text: data.nama, // Menampilkan nama jika ada, jika tidak tampilkan 'Selamat datang'
-                            timer: 2000, // Menampilkan alert selama 2 detik
+                            text: data.nama,
+                            timer: 2000,
                             showConfirmButton: false,
                             didOpen: () => {
-                                speak(welcomeText); // Membaca teks yang sesuai
+                                speak(welcomeText);
                             }
                         }).then(() => {
-                            // Redirect atau lakukan tindakan lain setelah sukses
-                            form.reset(); // Ganti dengan URL tujuan Anda
+                            // Reset form
+                            form.reset();
+
+                            // Hapus preview foto
+                            const photoPreview = document.getElementById('photoPreview');
+                            photoPreview.src = ''; // Hapus sumber gambar
+                            photoPreview.style.display = 'none'; // Sembunyikan elemen gambar
+
+                            clearCanvas();
                         });
                     } else {
                         Swal.fire({
@@ -412,6 +508,101 @@
                 });
         });
     </script>
+    <script>
+        const canvas = document.getElementById('signature-canvas');
+        const context = canvas.getContext('2d');
+        let isDrawing = false;
+
+        function setCanvasBackground() {
+            context.fillStyle = "white";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        setCanvasBackground();
+        canvas.addEventListener('mousedown', (event) => {
+            isDrawing = true;
+            context.beginPath();
+            context.moveTo(event.offsetX, event.offsetY);
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (isDrawing) {
+                context.lineTo(event.offsetX, event.offsetY);
+                context.strokeStyle = "black";
+                context.lineWidth = 2;
+                context.stroke();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDrawing = false;
+        });
+
+        document.getElementById('clear-canvas').addEventListener('click', (e) => {
+            e.preventDefault();
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            setCanvasBackground();
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const webcamModal = new bootstrap.Modal(document.getElementById('webcamModal'));
+            const webcamVideo = document.getElementById('webcam');
+            const photoCanvas = document.getElementById('photoCanvas');
+            const photoContext = photoCanvas.getContext('2d');
+            const photoPreview = document.getElementById('photoPreview');
+
+            document.getElementById('take-picture').addEventListener('click', function(e) {
+                e.preventDefault();
+                webcamModal.show();
+                navigator.mediaDevices.getUserMedia({
+                        video: true
+                    })
+                    .then(function(stream) {
+                        webcamVideo.srcObject = stream;
+                        webcamVideo.play();
+                    })
+                    .catch(function(error) {
+                        console.error("Error accessing webcam: ", error);
+                    });
+            });
+
+            document.getElementById('take-photo').addEventListener('click', function() {
+                const width = webcamVideo.videoWidth;
+                const height = webcamVideo.videoHeight;
+
+                photoCanvas.width = width;
+                photoCanvas.height = height;
+                photoContext.drawImage(webcamVideo, 0, 0, width, height);
+
+                const photoURL = photoCanvas.toDataURL('image/png');
+                photoPreview.src = photoURL;
+                photoPreview.style.display = 'block';
+
+                const stream = webcamVideo.srcObject;
+                if (stream) {
+                    const tracks = stream.getTracks();
+                    tracks.forEach(track => track.stop());
+                }
+                webcamVideo.srcObject = null;
+
+                webcamModal.hide();
+            });
+
+            document.getElementById('webcamModal').addEventListener('hidden.bs.modal', function() {
+                const stream = webcamVideo.srcObject;
+                if (stream) {
+                    const tracks = stream.getTracks();
+                    tracks.forEach(track => track.stop());
+                }
+                webcamVideo.srcObject = null;
+            });
+        });
+    </script>
+
 </body>
 
 </html>

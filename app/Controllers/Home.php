@@ -55,6 +55,9 @@ class Home extends BaseController
         $tujuan = $this->request->getPost('tujuan');
         $kepentingan = $this->request->getPost('kepentingan');
 
+        // $nik = esc($nik);
+        // $tujuan = esc($tujuan);
+        // $kepentingan = esc($kepentingan);
         // Data yang akan disimpan ke tb_pengunjung
         $data = [
             'nik'        => $nik,
@@ -62,12 +65,9 @@ class Home extends BaseController
             'kepentingan' => $kepentingan,
         ];
 
-        // Cek apakah NIK sudah ada di tabel db_data
         $existingData = $this->model->getDataByNik($nik);
 
-        // Simpan data ke tabel tb_pengunjung
         if ($this->pengunjung->insert($data)) {
-            // Menentukan pesan berdasarkan ada atau tidaknya data di db_data
             $message = $existingData ? 'Data sudah ada di db_data dan berhasil disimpan di tb_pengunjung!' : 'Data berhasil disimpan di tb_pengunjung!';
             $success = true;
             $nama = $existingData ? $existingData['nama'] : null;
